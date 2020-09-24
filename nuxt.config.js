@@ -91,5 +91,23 @@ export default {
   ** See https://nuxtjs.org/api/configuration-build/
   */
   build: {
+  },
+  /*
+  ** Server configuration
+  ** See https://nuxtjs.org/api/configuration-build/
+  */
+  server: {
+    port: 3333,
+    host: '0.0.0.0'
+  },
+  /*
+  ** PWA configuration
+  ** See https://pwa.nuxtjs.org/icon/
+  */
+  pwa: {
+    icon: {
+      source: 'static/icon.png',
+      filename: 'icon.png'
+    }
   }
 }

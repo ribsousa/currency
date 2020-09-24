@@ -1,3 +1,9 @@
+<p align="center">
+    <a href="https://currency.gleebe.com/">
+        <img src="https://currency.gleebe.com/icon.png" alt="Currency" width="8%" />
+    </a>
+</p>
+
 # currency
 
 ## Build Setup

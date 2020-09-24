@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar
-      color="warning"
+      color="amber"
       fixed
       short
       tile
@@ -9,11 +9,12 @@
       app
     >
       <v-spacer />
-      <v-icon
-        large
-      >
-        mdi-currency-usd-circle-outline
-      </v-icon>
+      <v-avatar class="mr-1" size="35">
+        <img
+          src="icon.png"
+          alt="Currency"
+        >
+      </v-avatar>
       <v-toolbar-title v-text="title" />
       <v-spacer />
     </v-app-bar>
@@ -63,7 +64,7 @@
 export default {
   data () {
     return {
-      title: 'Converter'
+      title: 'Currency'
     }
   }
 }

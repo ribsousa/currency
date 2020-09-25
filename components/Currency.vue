@@ -9,18 +9,25 @@
       sm8
       md6
     >
-      <v-switch
-        v-model="themeDark"
-        :prepend-icon="themeDark ? 'mdi-lightbulb-off-outline' : 'mdi-lightbulb-on-outline'"
-        @click="changeTheme()"
-      />
+      <v-skeleton-loader
+        :loading="starting"
+        class="mx-auto, mt-5 mb-3"
+        min-width="300"
+        transition="scale-transition"
+        type="chip"
+      >
+        <v-switch
+          v-model="themeDark"
+          :prepend-icon="themeDark ? 'mdi-lightbulb-off-outline' : 'mdi-lightbulb-on-outline'"
+          @click="changeTheme()"
+        />
+      </v-skeleton-loader>
       <v-skeleton-loader
         :loading="starting"
         class="mx-auto"
         min-width="300"
-        max-width="300"
         transition="scale-transition"
-        type="card"
+        type="image"
       >
         <v-card
           outlined
@@ -38,15 +45,15 @@
             <v-btn icon :loading="loading">
               <v-icon
                 v-if="currentInput === 'fromCurrency' && loading === false"
-                @click="changeCurrency(currentInput, true, true)"
                 color="success"
+                @click="changeCurrency(currentInput, true, true)"
               >
                 mdi-arrow-right-thin-circle-outline
               </v-icon>
               <v-icon
                 v-if="currentInput === 'toCurrency' && loading === false"
-                @click="changeCurrency(currentInput, true, true)"
                 color="success"
+                @click="changeCurrency(currentInput, true, true)"
               >
                 mdi-arrow-left-thin-circle-outline
               </v-icon>
@@ -250,9 +257,12 @@ export default {
   },
 
   created () {
-    this.starting = false
     this.loadCurrencies()
     this.changeCurrency('fromCurrency', true)
+  },
+
+  mounted () {
+    this.starting = false
   },
 
   methods: {

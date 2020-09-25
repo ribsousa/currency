@@ -14,155 +14,164 @@
         :prepend-icon="themeDark ? 'mdi-lightbulb-off-outline' : 'mdi-lightbulb-on-outline'"
         @click="changeTheme()"
       />
-      <v-card
-        outlined
-        :loading="loading"
-        :disabled="disabled"
+      <v-skeleton-loader
+        :loading="starting"
+        class="mx-auto"
+        min-width="300"
+        max-width="300"
+        transition="scale-transition"
+        type="card"
       >
-        <v-toolbar flat dense class="caption">
-          <v-spacer />
-          <span class="mr-1">
-            ({{ fromCurrency.currencyId }}) {{ fromCurrency.alpha3 }}
-          </span>
-          <gb-flag
-            :code="`${fromCurrency.id.toLowerCase()}`"
-          />
-          <v-btn icon :loading="loading">
-            <v-icon
-              v-if="currentInput === 'fromCurrency' && loading === false"
-              @click="changeCurrency(currentInput, true, true)"
-              color="success"
-            >
-              mdi-arrow-right-thin-circle-outline
-            </v-icon>
-            <v-icon
-              v-if="currentInput === 'toCurrency' && loading === false"
-              @click="changeCurrency(currentInput, true, true)"
-              color="success"
-            >
-              mdi-arrow-left-thin-circle-outline
-            </v-icon>
-          </v-btn>
-          <gb-flag
-            :code="`${toCurrency.id.toLowerCase()}`"
-          />
-          <span class="ml-1">
-            {{ toCurrency.alpha3 }} ({{ toCurrency.currencyId }})
-          </span>
-          <v-spacer />
-        </v-toolbar>
-        <v-card-title class="headline">
-          <div>
-            <span
-              v-if="currentInput === 'fromCurrency'"
-              class="subtitle-1"
-            >
-              {{ formatCurrency(fromCurrencyValue, fromCurrency.currencyId, 1, 6) }}
-              {{ fromCurrency.currencyName }} equals
+        <v-card
+          outlined
+          :loading="loading"
+          :disabled="disabled"
+        >
+          <v-toolbar flat dense class="caption">
+            <v-spacer />
+            <span class="mr-1">
+              ({{ fromCurrency.currencyId }}) {{ fromCurrency.alpha3 }}
             </span>
-            <span
-              v-else
-              class="subtitle-1"
-            >
-              {{ formatCurrency(toCurrencyValue, toCurrency.currencyId, 1, 6) }}
-              {{ toCurrency.currencyName }} equals
-            </span>
-            <h4
-              v-if="currentInput === 'fromCurrency'"
-              class="font-weight-regular"
-            >
-              {{ formatCurrency(toCurrencyValue, toCurrency.currencyId, 2, 3) }}
-              {{ toCurrency.currencyName }}
-            </h4>
-            <h4
-              v-else
-              class="font-weight-regular"
-            >
-              {{ formatCurrency(fromCurrencyValue, fromCurrency.currencyId, 2, 3) }}
-              {{ fromCurrency.currencyName }}
-            </h4>
-            <span class="caption">
-              {{ now }} ·
-              <a
-                :class="`${themeDark ? 'white--text' : 'black--text'}`"
-                class="apilink"
-                href="https://www.currencyconverterapi.com/"
+            <gb-flag
+              :code="`${fromCurrency.id.toLowerCase()}`"
+            />
+            <v-btn icon :loading="loading">
+              <v-icon
+                v-if="currentInput === 'fromCurrency' && loading === false"
+                @click="changeCurrency(currentInput, true, true)"
+                color="success"
               >
-                Fontes
-              </a>
+                mdi-arrow-right-thin-circle-outline
+              </v-icon>
+              <v-icon
+                v-if="currentInput === 'toCurrency' && loading === false"
+                @click="changeCurrency(currentInput, true, true)"
+                color="success"
+              >
+                mdi-arrow-left-thin-circle-outline
+              </v-icon>
+            </v-btn>
+            <gb-flag
+              :code="`${toCurrency.id.toLowerCase()}`"
+            />
+            <span class="ml-1">
+              {{ toCurrency.alpha3 }} ({{ toCurrency.currencyId }})
             </span>
-          </div>
-        </v-card-title>
-        <v-card-text>
-          <v-form ref="form">
-            <v-container>
-              <v-row dense align="center" justify="center">
-                <v-col
-                  cols="4"
+            <v-spacer />
+          </v-toolbar>
+          <v-card-title class="headline">
+            <div>
+              <span
+                v-if="currentInput === 'fromCurrency'"
+                class="subtitle-1"
+              >
+                {{ formatCurrency(fromCurrencyValue, fromCurrency.currencyId, 1, 6) }}
+                {{ fromCurrency.currencyName }} equals
+              </span>
+              <span
+                v-else
+                class="subtitle-1"
+              >
+                {{ formatCurrency(toCurrencyValue, toCurrency.currencyId, 1, 6) }}
+                {{ toCurrency.currencyName }} equals
+              </span>
+              <h4
+                v-if="currentInput === 'fromCurrency'"
+                class="font-weight-regular"
+              >
+                {{ formatCurrency(toCurrencyValue, toCurrency.currencyId, 2, 3) }}
+                {{ toCurrency.currencyName }}
+              </h4>
+              <h4
+                v-else
+                class="font-weight-regular"
+              >
+                {{ formatCurrency(fromCurrencyValue, fromCurrency.currencyId, 2, 3) }}
+                {{ fromCurrency.currencyName }}
+              </h4>
+              <span class="caption">
+                {{ now }} ·
+                <a
+                  :class="`${themeDark ? 'white--text' : 'black--text'}`"
+                  class="apilink"
+                  href="https://www.currencyconverterapi.com/"
                 >
-                  <v-text-field
-                    v-model="fromCurrencyValue"
-                    type="number"
-                    min="1"
-                    step="1"
-                    required
-                    outlined
-                    dense
-                    @change="changeCurrency('fromCurrency', true)"
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-autocomplete
-                    v-model="fromCurrency"
-                    :items="items"
-                    item-text="currencyName"
-                    item-value="currencyId"
-                    return-object
-                    outlined
-                    dense
-                    @change="changeCurrency('fromCurrency', false)"
-                  />
-                </v-col>
-              </v-row>
-              <v-row dense align="center" justify="center">
-                <v-col
-                  cols="4"
-                >
-                  <v-text-field
-                    v-model="toCurrencyValue"
-                    type="number"
-                    min="1"
-                    required
-                    outlined
-                    dense
-                    @change="changeCurrency('toCurrency', true)"
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-autocomplete
-                    v-model="toCurrency"
-                    :items="items"
-                    item-text="currencyName"
-                    item-value="currencyId"
-                    return-object
-                    outlined
-                    dense
-                    @change="changeCurrency('toCurrency', false)"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-form>
-          <a
-            href="https://www.currencyconverterapi.com/"
-            class="caption apilink"
-            target="_blanck"
-            :class="`${themeDark ? 'white--text' : 'black--text'}`"
-          >
-            Dados de câmbio disponibilizados por Currency Converter
-          </a>
-        </v-card-text>
-      </v-card>
+                  Fontes
+                </a>
+              </span>
+            </div>
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="form">
+              <v-container>
+                <v-row dense align="center" justify="center">
+                  <v-col
+                    cols="4"
+                  >
+                    <v-text-field
+                      v-model="fromCurrencyValue"
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      outlined
+                      dense
+                      @change="changeCurrency('fromCurrency', true)"
+                    />
+                  </v-col>
+                  <v-col cols="4">
+                    <v-autocomplete
+                      v-model="fromCurrency"
+                      :items="items"
+                      item-text="currencyName"
+                      item-value="currencyId"
+                      return-object
+                      outlined
+                      dense
+                      @change="changeCurrency('fromCurrency', false)"
+                    />
+                  </v-col>
+                </v-row>
+                <v-row dense align="center" justify="center">
+                  <v-col
+                    cols="4"
+                  >
+                    <v-text-field
+                      v-model="toCurrencyValue"
+                      type="number"
+                      min="1"
+                      required
+                      outlined
+                      dense
+                      @change="changeCurrency('toCurrency', true)"
+                    />
+                  </v-col>
+                  <v-col cols="4">
+                    <v-autocomplete
+                      v-model="toCurrency"
+                      :items="items"
+                      item-text="currencyName"
+                      item-value="currencyId"
+                      return-object
+                      outlined
+                      dense
+                      @change="changeCurrency('toCurrency', false)"
+                    />
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+            <a
+              href="https://www.currencyconverterapi.com/"
+              class="caption apilink"
+              target="_blanck"
+              :class="`${themeDark ? 'white--text' : 'black--text'}`"
+            >
+              Dados de câmbio disponibilizados por Currency Converter
+            </a>
+          </v-card-text>
+        </v-card>
+      </v-skeleton-loader>
       <v-snackbar
         v-model="showError"
         color="error"
@@ -191,6 +200,7 @@ import { API_URL, API_KEY } from '~/settings/api'
 export default {
   data () {
     return {
+      starting: true,
       loading: false,
       fromCurrency: {
         alpha3: 'BRA',
@@ -240,6 +250,7 @@ export default {
   },
 
   created () {
+    this.starting = false
     this.loadCurrencies()
     this.changeCurrency('fromCurrency', true)
   },

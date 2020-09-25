@@ -261,17 +261,15 @@ export default {
     this.changeCurrency('fromCurrency', true)
   },
 
-  mounted () {
-    this.starting = false
-  },
-
   methods: {
     loadCurrencies () {
+      this.starting = true
       axios.get(`${API_URL}countries?apiKey=${API_KEY}`)
         .then((response) => {
           this.generate(response.data.results)
         })
         .catch(error => console.log(error))
+        .finally(() => { this.starting = false })
     },
 
     generate (obj) {

@@ -131,12 +131,31 @@
                       v-model="fromCurrency"
                       :items="items"
                       item-text="currencyName"
-                      item-value="currencyId"
+                      item-value="id"
                       return-object
+                      hide-selected
+                      single-line
                       outlined
                       dense
                       @change="changeCurrency('fromCurrency', false)"
-                    />
+                    >
+                      <template v-slot:selection="{ item }">
+                        <v-avatar left tile class="mr-1" size="24">
+                          <v-img :src="`flags/${item.id.toLowerCase()}.svg`"></v-img>
+                        </v-avatar>
+                        <span>{{ item.currencyId }}</span>
+                      </template>
+                      <template v-slot:item="data">
+                        <v-list-item-avatar>
+                          <v-avatar size="24" tile>
+                            <v-img :src="`flags/${data.item.id.toLowerCase()}.svg`"></v-img>
+                          </v-avatar>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <v-list-item-title v-html="data.item.currencyName"></v-list-item-title>
+                        </v-list-item-content>
+                      </template>
+                    </v-autocomplete>
                   </v-col>
                 </v-row>
                 <v-row dense align="center" justify="center">
@@ -158,12 +177,31 @@
                       v-model="toCurrency"
                       :items="items"
                       item-text="currencyName"
-                      item-value="currencyId"
+                      item-value="id"
                       return-object
+                      hide-selected
+                      single-line
                       outlined
                       dense
                       @change="changeCurrency('toCurrency', false)"
-                    />
+                    >
+                      <template v-slot:selection="{ item }">
+                        <v-avatar left tile class="mr-1" size="24">
+                          <v-img :src="`flags/${item.id.toLowerCase()}.svg`"></v-img>
+                        </v-avatar>
+                        <span>{{ item.currencyId }}</span>
+                      </template>
+                      <template v-slot:item="data">
+                        <v-list-item-avatar>
+                          <v-avatar size="24" tile>
+                            <v-img :src="`flags/${data.item.id.toLowerCase()}.svg`"></v-img>
+                          </v-avatar>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                            <v-list-item-title v-html="data.item.currencyName"></v-list-item-title>
+                        </v-list-item-content>
+                      </template>
+                    </v-autocomplete>
                   </v-col>
                 </v-row>
               </v-container>
@@ -186,7 +224,9 @@
         outlined
         center
       >
-        Serviço indisponível, volte mais tarde!
+        <span :class="`${themeDark ? 'white--text' : 'error--text'}`">
+          Serviço indisponível, volte mais tarde!
+        </span>
         <template v-slot:action="{ attrs }">
           <v-btn
             icon
@@ -257,6 +297,8 @@ export default {
   },
 
   created () {
+    this.themeDark = this.getTheme()
+    this.$vuetify.theme.dark = this.themeDark
     this.loadCurrencies()
     this.changeCurrency('fromCurrency', true)
   },
@@ -365,11 +407,32 @@ export default {
     },
 
     changeTheme () {
-      this.$vuetify.theme.dark = this.themeDark
+      this.updateTheme()
     },
 
     validate () {
       this.$refs.form.validate()
+    },
+
+    storeTheme () {
+      if (process.browser) {
+        localStorage.setItem('theme', JSON.stringify(this.themeDark))
+      }
+    },
+
+    updateTheme () {
+      if (process.browser) {
+        this.$vuetify.theme.dark = this.themeDark
+        this.storeTheme()
+      }
+    },
+
+    getTheme () {
+      if (process.browser) {
+        const theme = JSON.parse(localStorage.getItem('theme'))
+        const setTheme = (theme === null) ? this.themeDark : theme
+        return setTheme
+      }
     }
   }
 }

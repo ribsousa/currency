@@ -30,14 +30,14 @@ export default {
   /*
   ** Global CSS
   */
-  css: [
-  ],
+  css: [],
   /*
   ** Plugins to load before mounting the App
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    { src: "@/plugins/vueflags.js" }
+    { src: "@/plugins/vueflags.js" },
+    { src: "@/plugins/vue-uuid.js" }
   ],
   /*
   ** Auto import components

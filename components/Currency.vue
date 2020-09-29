@@ -141,18 +141,18 @@
                     >
                       <template v-slot:selection="{ item }">
                         <v-avatar left tile class="mr-1" size="24">
-                          <v-img :src="`flags/${item.id.toLowerCase()}.svg`"></v-img>
+                          <v-img :src="`flags/${item.id.toLowerCase()}.svg`" />
                         </v-avatar>
                         <span>{{ item.currencyId }}</span>
                       </template>
                       <template v-slot:item="data">
                         <v-list-item-avatar>
                           <v-avatar size="24" tile>
-                            <v-img :src="`flags/${data.item.id.toLowerCase()}.svg`"></v-img>
+                            <v-img :src="`flags/${data.item.id.toLowerCase()}.svg`" />
                           </v-avatar>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                            <v-list-item-title v-html="data.item.currencyName"></v-list-item-title>
+                          <v-list-item-title v-text="data.item.currencyName" />
                         </v-list-item-content>
                       </template>
                     </v-autocomplete>
@@ -187,18 +187,18 @@
                     >
                       <template v-slot:selection="{ item }">
                         <v-avatar left tile class="mr-1" size="24">
-                          <v-img :src="`flags/${item.id.toLowerCase()}.svg`"></v-img>
+                          <v-img :src="`flags/${item.id.toLowerCase()}.svg`" />
                         </v-avatar>
                         <span>{{ item.currencyId }}</span>
                       </template>
                       <template v-slot:item="data">
                         <v-list-item-avatar>
                           <v-avatar size="24" tile>
-                            <v-img :src="`flags/${data.item.id.toLowerCase()}.svg`"></v-img>
+                            <v-img :src="`flags/${data.item.id.toLowerCase()}.svg`" />
                           </v-avatar>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                            <v-list-item-title v-html="data.item.currencyName"></v-list-item-title>
+                          <v-list-item-title v-text="data.item.currencyName" />
                         </v-list-item-content>
                       </template>
                     </v-autocomplete>
@@ -242,6 +242,7 @@
 </template>
 <script>
 import axios from 'axios'
+import { uuid } from 'vue-uuid'
 import { API_URL, API_KEY } from '~/settings/api'
 
 export default {
@@ -277,7 +278,9 @@ export default {
       fromCurrencyValueRules: [
         v => !!v || '',
         v => (v && '^[+-]?[0-9]{1,9}(?:.[0-9]{1,2})?$') || '0'
-      ]
+      ],
+      converted: {},
+      conversions: []
     }
   },
 
@@ -358,6 +361,25 @@ export default {
     converter (component, change, query) {
       this.loading = true
       this.disabled = true
+      const options = {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      }
+      this.converted.id = uuid.v1()
+      this.converted.convertedAt = new Date().toLocaleDateString('pt-br', options)
+      this.converted.fromCurrencyId = this.fromCurrency.currencyId
+      this.converted.fromCurrencyApha3 = this.fromCurrency.alpha3
+      this.converted.fromCurrencyName = this.fromCurrency.currencyName
+      this.converted.fromCurrencySymbol = this.fromCurrency.currencySymbol
+      this.converted.fromCurrencyCountryId = this.fromCurrency.id
+      this.converted.toCurrencyId = this.toCurrency.currencyId
+      this.converted.toCurrencyApha3 = this.toCurrency.alpha3
+      this.converted.toCurrencyName = this.toCurrency.currencyName
+      this.converted.toCurrencySymbol = this.toCurrency.currencySymbol
+      this.converted.toCurrencyCountryId = this.toCurrency.id
       axios.get(`${API_URL}convert?apiKey=${API_KEY}&q=${query}&compact=ultra`)
         .then((response) => {
           let value = 0
@@ -366,21 +388,34 @@ export default {
               if (this.currentInput === 'fromCurrency') {
                 value = response.data[query] * this.fromCurrencyValue
                 this.toCurrencyValue = this.roundNumber(value, 2)
+                this.converted.currentInput = this.currentInput
+                this.converted.fromCurrencyValue = this.fromCurrencyValue
+                this.converted.toCurrencyValue = value
               } else {
                 value = response.data[query] * parseFloat(this.toCurrencyValue)
                 this.fromCurrencyValue = this.roundNumber(value, 2)
+                this.converted.currentInput = this.currentInput
+                this.converted.fromCurrencyValue = value
+                this.converted.toCurrencyValue = this.toCurrencyValue
               }
               break
             case 'toCurrency':
               if (this.currentInput === 'toCurrency') {
                 value = response.data[query] * parseFloat(this.toCurrencyValue)
                 this.fromCurrencyValue = this.roundNumber(value, 2)
+                this.converted.currentInput = this.currentInput
+                this.converted.fromCurrencyValue = value
+                this.converted.toCurrencyValue = this.toCurrencyValue
               } else {
                 value = response.data[query] * parseFloat(this.fromCurrencyValue)
                 this.toCurrencyValue = this.roundNumber(value, 2)
+                this.converted.currentInput = this.currentInput
+                this.converted.fromCurrencyValue = this.fromCurrencyValue
+                this.converted.toCurrencyValue = value
               }
               break
           }
+          this.storeConverted()
         })
         .catch((error) => {
           this.errors = error
@@ -432,6 +467,16 @@ export default {
         const theme = JSON.parse(localStorage.getItem('theme'))
         const setTheme = (theme === null) ? this.themeDark : theme
         return setTheme
+      }
+    },
+
+    storeConverted () {
+      if (process.browser) {
+        let stored = localStorage.getItem('conversions')
+        stored = stored ? JSON.parse(stored) : []
+        stored.unshift(this.converted)
+        this.conversions = stored
+        localStorage.setItem('conversions', JSON.stringify(stored))
       }
     }
   }

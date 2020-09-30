@@ -38,7 +38,7 @@
             icon="mdi-lock"
           >
             <v-icon
-              @click="dialog = false"
+              @click="dialog = false, closeClear()"
             >
               mdi-sack
             </v-icon>
@@ -53,16 +53,21 @@
             <v-btn
               dark
               icon
-              @click="dialog = false"
+              @click="dialog = false, closeClear()"
             >
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-container>
-          <v-card outlined tile class="mt-5 pl-2 pr-2">
+          <v-card
+            outlined
+            tile
+            :disabled="disabled"
+            class="mt-5 pl-2 pr-2"
+          >
             <v-toolbar tile flat dense>
-              My coversions
+              Coversions
               <v-divider vertical inset class="mx-3" />
               <v-icon
                 v-if="selected.length"
@@ -93,6 +98,7 @@
               :headers="headers"
               :items="conversions"
               :search="search"
+              :loading="loading"
               class="elevation-0"
               locale="pt-BR"
               show-select
@@ -137,9 +143,9 @@
                     </v-avatar>
                     {{ item.currentInput === 'fromCurrency' ? item.toCurrencyId : item.fromCurrencyId }}
                   </template>
-                    <span>
-                      {{ item.currentInput === 'fromCurrency' ? item.toCurrencyName : item.fromCurrencyName }}
-                    </span>
+                  <span>
+                    {{ item.currentInput === 'fromCurrency' ? item.toCurrencyName : item.fromCurrencyName }}
+                  </span>
                 </v-tooltip>
               </template>
               <template v-slot:item.toCurrencyValue="{ item }">
@@ -188,7 +194,7 @@
                 color="indigo"
                 icon
                 v-bind="attrs"
-                @click="confirmDestroy = false, selected = []"
+                @click="closeClear()"
               >
                 <v-icon
                   color="error"
@@ -209,6 +215,8 @@ export default {
   data () {
     return {
       confirmDestroy: false,
+      loading: false,
+      disabled: false,
       search: '',
       starting: true,
       dialog: false,
@@ -270,9 +278,15 @@ export default {
     },
 
     confirmShow (item = null) {
+      this.loading = true
+      this.disabled = true
       this.confirmDestroy = true
       if (item) {
-        this.selected.push(item)
+        const selected = this.selected.filter(selected => selected.id === item.id)
+        console.log(selected)
+        if (selected.length === 0) {
+          this.selected.push(item)
+        }
       }
     },
 
@@ -281,9 +295,15 @@ export default {
         this.selected.forEach((selected, index) => {
           this.deleteItem(selected)
         })
-        this.selected = []
-        this.confirmDestroy = false
+        this.closeClear()
       }
+    },
+
+    closeClear () {
+      this.loading = false
+      this.selected = []
+      this.disabled = false
+      this.confirmDestroy = false
     }
   }
 }

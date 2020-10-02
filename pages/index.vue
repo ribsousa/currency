@@ -9,8 +9,8 @@
       sm8
       md6
     >
-      <currency />
-      <conversions />
+      <currency :dialog="showModal" @show="update" />
+      <conversions :dialog="showModal" @show="update" />
       <install />
     </v-flex>
   </v-layout>
@@ -26,6 +26,18 @@ export default {
     Conversions,
     Currency,
     Install
+  },
+
+  data () {
+    return {
+      showModal: false
+    }
+  },
+
+  methods: {
+    update (showModal) {
+      this.showModal = showModal
+    }
   }
 }
 </script>

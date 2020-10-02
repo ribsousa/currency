@@ -237,6 +237,32 @@
           </v-btn>
         </template>
       </v-snackbar>
+      <v-skeleton-loader
+        v-show="amount"
+        :loading="starting"
+        class="mx-auto, mt-5 mb-3"
+        min-width="300"
+        transition="scale-transition"
+        type="chip"
+      >
+        <v-badge
+          bordered
+          overlap
+          mode="in-out"
+          :content="amount"
+          color="error"
+        >
+          <span class="caption">Minhas conversões</span>
+          <v-btn
+            fab
+            x-small
+            color="success"
+            @click="showDialog()"
+          >
+            <v-icon>mdi-sack</v-icon>
+          </v-btn>
+        </v-badge>
+      </v-skeleton-loader>
     </v-flex>
   </v-layout>
 </template>
@@ -246,10 +272,19 @@ import { uuid } from 'vue-uuid'
 import { API_URL, API_KEY } from '~/settings/api'
 
 export default {
+  props: {
+    dialog: {
+      type: Boolean,
+      required: true
+    }
+  },
+
   data () {
     return {
+      showModal: this.dialog,
       starting: true,
       loading: false,
+      amount: 0,
       fromCurrency: {
         alpha3: 'BRA',
         currencyId: 'BRL',
@@ -299,10 +334,17 @@ export default {
     }
   },
 
+  watch: {
+    dialog () {
+      this.countConversions()
+    }
+  },
+
   created () {
     this.themeDark = this.getTheme()
     this.$vuetify.theme.dark = this.themeDark
     this.loadCurrencies()
+    this.countConversions()
     this.changeCurrency('fromCurrency', true)
   },
 
@@ -416,6 +458,7 @@ export default {
               break
           }
           this.storeConverted()
+          this.countConversions()
         })
         .catch((error) => {
           this.errors = error
@@ -478,6 +521,19 @@ export default {
         this.conversions = stored
         localStorage.setItem('conversions', JSON.stringify(stored))
       }
+    },
+
+    countConversions () {
+      if (process.browser) {
+        const conversions = JSON.parse(localStorage.getItem('conversions'))
+        this.amount = conversions.length
+      }
+    },
+
+    showDialog () {
+      this.countConversions()
+      this.showModal = true
+      this.$emit('show', this.showModal)
     }
   }
 }

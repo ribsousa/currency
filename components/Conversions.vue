@@ -7,27 +7,6 @@
     type="chip"
   >
     <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-      <template v-slot:activator="{ on, attrs }">
-        <v-badge
-          bordered
-          overlap
-          mode="in-out"
-          :content="amount"
-          color="error"
-          icon="mdi-lock"
-        >
-          <span class="caption">Minhas conversões</span>
-          <v-btn
-            icon
-            color="success"
-            v-bind="attrs"
-            v-on="on"
-            @click="getConversions()"
-          >
-            <v-icon>mdi-sack</v-icon>
-          </v-btn>
-        </v-badge>
-      </template>
       <v-card>
         <v-toolbar dark short flat tile color="teal">
           <v-badge
@@ -38,7 +17,7 @@
             icon="mdi-lock"
           >
             <v-icon
-              @click="dialog = false, closeClear()"
+              @click="closeDialog(), closeClear()"
             >
               mdi-sack
             </v-icon>
@@ -53,7 +32,7 @@
             <v-btn
               dark
               icon
-              @click="dialog = false, closeClear()"
+              @click="closeDialog(), closeClear()"
             >
               <v-icon>mdi-close-circle-outline</v-icon>
             </v-btn>
@@ -212,14 +191,21 @@
 
 <script>
 export default {
+  props: {
+    dialog: {
+      type: Boolean,
+      required: true
+    }
+  },
+
   data () {
     return {
+      showModal: this.dialog,
       confirmDestroy: false,
       loading: false,
       disabled: false,
       search: '',
       starting: true,
-      dialog: false,
       notifications: false,
       sound: true,
       widgets: false,
@@ -239,6 +225,12 @@ export default {
         { text: 'Converted At', value: 'convertedAt' },
         { text: 'Actions', value: 'actions', sortable: false }
       ]
+    }
+  },
+
+  watch: {
+    dialog () {
+      this.getConversions()
     }
   },
 
@@ -283,7 +275,6 @@ export default {
       this.confirmDestroy = true
       if (item) {
         const selected = this.selected.filter(selected => selected.id === item.id)
-        console.log(selected)
         if (selected.length === 0) {
           this.selected.push(item)
         }
@@ -304,6 +295,11 @@ export default {
       this.selected = []
       this.disabled = false
       this.confirmDestroy = false
+    },
+
+    closeDialog () {
+      this.showModal = false
+      this.$emit('show', this.showModal)
     }
   }
 }
